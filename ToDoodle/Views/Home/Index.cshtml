@@ -1,0 +1,104 @@
+﻿<div id="app-content">
+    <div class="row">
+        <div class="col-lg-6 col-md-12" v-for="list in user.Lists">
+            <div class="card card-nav-tabs">
+                <div class="card-header" data-background-color="purple">
+                    <div class="nav-tabs-navigation">
+                        <div class="nav-tabs-wrapper">
+                            <ul class="nav nav-tabs" data-tabs="tabs">
+                                <li>
+                                    {{ list.Title }}
+                                    <div class="ripple-container"></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="tab-content">
+                        <div style="display:inline">
+                            <div class="tab-pane" :id="list.Title">
+                                <div class="tab-pane-row row" v-for="item in list.Items">
+                                    <div class="tab-row-cell col-md-1">
+                                        <div style="width:20px" class="checkbox">
+                                            <label>
+                                                <input :value="item.Id" type="checkbox" :id="'item-checkbox-'+item.Id" :name="'item-checkbox-'+item.Id" class="item-checkbox">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div :data-id="item.Id" class="item-title tab-row-cell col-md-9" style="line-height:40px">
+                                        <span :id="'item-title-label-'+item.Id" class="item-title-label">{{ item.Title }}</span>
+                                        <span :id="'item-title-text-'+item.Id" class="item-title-text form-group" style="display:none">
+                                            <input type="text" :value="item.Title" class="form-control" />
+                                        </span>
+                                    </div>
+                                    <div class="tab-row-cell col-md-2">
+                                        <button :id="'item-remove-'+item.Id" :value="item.Id" type="button" rel="tooltip" title="Remove" class="item-remote btn btn-danger btn-simple btn-xs">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                    </div>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    var whenExists = function (selector, callback) {
+        if (jQuery(selector).length) {
+            callback();
+        } else {
+            setTimeout(function () {
+                whenExists(selector, callback);
+            }, 100);
+        }
+    };
+    $(window).ready(function () {
+        $.fn.editable.defaults.mode = 'inline';
+        var userId = 1;
+        $.ajax({
+            method: "GET",
+            url: "/api/Users/" + userId
+        }).done(function (response) {
+            Vue.set(app, 'user', response);
+            console.log(app.user);
+            whenExists('.item-checkbox', function () {
+                $('.item-checkbox').on('click', function (e) {
+                    var id = $(e.currentTarget).val();
+                    console.log(id);
+                    console.log(e.currentTarget.checked);
+                    if (e.currentTarget.checked) {
+                        $('#item-title-label-' + id).css('text-decoration', 'line-through');
+                    }
+                    else {
+                        $('#item-title-label-' + id).css('text-decoration', 'none');
+                    }
+                });
+                $('.item-title').on('click', function (e) {
+                    var id = $(e.currentTarget).closest('.item-title').data('id');
+                    $('#item-title-label-' + id).css('display', 'none');
+                    $('#item-title-text-' + id).css('display', 'inline');
+                });
+            });
+            $(window).on('click', function (e) {
+                var clickId = $(e.target).closest('.item-title-text').attr('id');
+                if (typeof(clickId) == "undefined") {
+                    clickId = e.target.id;
+                }
+                if (clickId.indexOf('-label') > 0) {
+                    clickId = e.target.id.replace('-label', '-text');
+                }
+                $('.item-title-text:visible').each(function () {
+                    var textId = $(this).attr('id');
+                    var labelId = textId.replace('-text', '-label');
+                    if (clickId != this.id) {
+                        $('#' + textId).css('display', 'none');
+                        $('#' + labelId).css('display', 'inline');
+                    }
+                });
+            });
+        });
+    })
+</script>

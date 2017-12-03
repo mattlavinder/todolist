@@ -1,0 +1,7 @@
+**/.vs
+**/.logs
+**/bin
+**/obj
+**/packages
+Web.config
+Web.*.config
