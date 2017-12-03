@@ -25,8 +25,8 @@ namespace ToDoodle
 
             bundles.Add(new ScriptBundle("~/bundles/vue").Include(
                       "~/assets/js/vue.min.js",
-                      "~/assets/js/vue.schema.js",
-                      "~/assets/js/vue.app.js"));
+                      "~/Scripts/vue.schema.js",
+                      "~/Scripts/vue.app.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/assets/css/font-awesome.min.css",
